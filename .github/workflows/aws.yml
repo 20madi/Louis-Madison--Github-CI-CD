@@ -5,7 +5,6 @@ on:
     branches: [ "main" ]
 
 env:
-  REMOTE_HOST: "ec2-172-31-17-129.ec2.internal"
   REMOTE_USER: "ec2-user"
 
 permissions:
@@ -18,13 +17,16 @@ jobs:
 
     steps:
       - name: Configure SSH
+        
+        env:
+          SSH_HOST: ${{ secrets.EC2_PUBLIC_ADDRESS}}
+          SSH_USER: ${{ env.REMOTE_USER }}
+          SSH_KEY: ${{ secrets.labuserpem }} 
+        
         run: |
           mkdir -p ~/.ssh/
           echo "$SSH_KEY" > ~/.ssh/github-actions-key
           chmod 600 ~/.ssh/github-actions-key
-          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST csci220_final/redeploy
-        env:
-          SSH_HOST: ${{ env.REMOTE_HOST }}
-          SSH_USER: ${{ env.REMOTE_USER }}
-          SSH_KEY: ${{ secrets.labuserpem }} 
+          ssh -i ~/.ssh/github-actions-key -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST 
+
 
